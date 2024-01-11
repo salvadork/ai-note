@@ -1,14 +1,24 @@
 import CreateNoteDialog from '@/components/ui/CreateNoteDialog'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { UserButton } from '@clerk/nextjs'
+import { db } from '@/lib/db'
+import { $notes } from '@/lib/db/schema'
+import { UserButton, auth } from '@clerk/nextjs'
+import { eq } from 'drizzle-orm'
 import { ArrowLeft } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
 type Props = {}
 
-function DashboardPage({}: Props) {
+const DashboardPage = async ({}: Props) => {
+
+    const {userId} = auth()
+    const notes = await db.select().from($notes).where(
+        eq($notes.userId, userId!)
+    )
+    
   return (
     <>
         <div className="grainy min-h-screen">
@@ -34,12 +44,34 @@ function DashboardPage({}: Props) {
                 <Separator  />
                 <div className="h-8"></div>
 
-                <div className="text-center">
+                {!notes.length && <div className="text-center">
                     <h2 className='text-xl text-gray-500'> You have no notes </h2>
-                </div>
+                </div>}
 
-                <div className='grid sm:grid-cols-3 md:grid-cols-5'>
+                <div className='grid sm:grid-cols-3 md:grid-cols-5 gap-5'>
                     <CreateNoteDialog />
+                    {notes.map(note => {
+                        return(
+                            <a href={`/notes/${note.id}`} key={note.id}>
+                                <div className='border border-stone-200 rounded-lg overflow-hidden flex flex-col hover:shadow-xl transition hover:-translate-y-1'>
+                                    <img 
+                                        width={400}
+                                        height={200}
+                                        alt={note.name}
+                                        src={note.imageUrl ||""}/>
+                                    <div className="p-4">
+                                        <h3 className='text-xl font-semibold text-gray-900'>
+                                            {note.name}
+                                        </h3>
+                                        <div className="h-1"></div>
+                                        <p className='text-sm text-gray-500'>
+                                            {new Date(note.createdAt).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        )
+                    })}
                 </div>
             </div>
         </div>
