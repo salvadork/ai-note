@@ -32,6 +32,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     createNoteBook.mutate(undefined, {
         onSuccess: ({note_id}) => {
             console.log("created note id", note_id)
+            
             router.push(`/notes/${note_id}`)
         },
         onError: (error) => {
