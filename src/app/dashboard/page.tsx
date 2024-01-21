@@ -54,7 +54,7 @@ const DashboardPage = async ({}: Props) => {
                         return(
                             <a href={`/notes/${note.id}`} key={note.id}>
                                 <div className='border border-stone-200 rounded-lg overflow-hidden flex flex-col hover:shadow-xl transition hover:-translate-y-1'>
-                                    <img 
+                                    <Image 
                                         width={400}
                                         height={200}
                                         alt={note.name}
